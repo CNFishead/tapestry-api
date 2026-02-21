@@ -42,6 +42,5 @@ export default (error: any, req: any, res: any, next?: any) => {
     return res.status(400).json({ message: messages.join(', ') || 'Validation Error' });
   }
 
-  console.log(`[Error Handler]:`, err);
   return res.status(err.statusCode || 500).json({ success: false, message: err.message || 'Server Error' });
 };

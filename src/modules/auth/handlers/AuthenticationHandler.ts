@@ -16,7 +16,6 @@ export class AuthenticationHandler {
    */
   async login(req: Request) {
     const { email, password } = req.body;
-    console.log(`[AuthHandler]: email: ${email}; pass: ${password}`);
 
     if (!email || !password) {
       throw new Error('Email and password are required.');
