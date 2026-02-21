@@ -1,9 +1,9 @@
 import axios from 'axios';
-import { UserType } from '../models/User';
+import { AuthType } from '../models/User';
 
 export class PaymentHandler {
   async createVault(
-    user: UserType,
+    user: AuthType,
     billingDetails: {
       creditCardDetails?: {
         ccnumber?: string;
@@ -55,7 +55,7 @@ export class PaymentHandler {
       };
     }
   }
-  async createCustomer(user: UserType) {
+  async createCustomer(user: AuthType) {
     try {
       // send a request to pyre to create a customer in the api
       const { data } = await axios.post(

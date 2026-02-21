@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import User from '../modules/auth/model/User';
+import User from '../modules/auth/model/Auth';
 
 interface JwtPayload {
   userId: string;

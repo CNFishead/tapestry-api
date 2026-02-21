@@ -1,6 +1,6 @@
 import { Request } from 'express';
 import { AuthenticatedRequest } from '../../../types/AuthenticatedRequest';
-import User from '../../auth/model/User';
+import User from '../../auth/model/Auth';
 import { Model, ObjectId } from 'mongoose';
 import Support from '../models/Support';
 import SupportGroup from '../models/SupportGroups';
@@ -19,7 +19,7 @@ export class AgentHandler {
       const error: any = new Error('Ticket not found');
       error.status = 404;
       throw error;
-    } 
+    }
     // Find the support groups the ticket belongs to
     const groupIds = ticket.groups.map((group: any) => group._id || group); // builds an array of group id's from the ticket.groups array, handling both populated and unpopulated cases
     const groups = await SupportGroup.find({ _id: { $in: groupIds } }); // finds all support groups that match the groupIds array

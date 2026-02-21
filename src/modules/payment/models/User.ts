@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-export interface UserType extends mongoose.Document {
+export interface AuthType extends mongoose.Document {
   _id: string;
   firstName: string;
   lastName: string;
@@ -24,4 +24,4 @@ export interface UserType extends mongoose.Document {
 
 const UserSchema = new mongoose.Schema({}, { strict: false });
 
-export default mongoose.model<UserType>('User', UserSchema);
+export default mongoose.model<AuthType>('User', UserSchema);

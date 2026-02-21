@@ -1,7 +1,7 @@
 import axios from 'axios';
 import PaymentProcessor from './PaymentProcess';
 import { CommonTransactionType } from '../../../types/CommonTransactionType';
-import User, { UserType } from '../models/User';
+import User, { AuthType } from '../models/User';
 import CommonCaptureTypes from '../../../types/CommonCaptureTypes';
 import CommonVoidTypes from '../../../types/CommonVoidTypes';
 import CommonRefundTypes from '../../../types/CommonRefundTypes';

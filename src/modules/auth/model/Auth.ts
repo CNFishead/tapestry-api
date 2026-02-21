@@ -12,7 +12,7 @@ import slugify from 'slugify';
  * @version 1.0
  * @lastModified - 2023-06-11T16:20:26.000-05:00
  */
-export interface UserType extends mongoose.Document {
+export interface AuthType extends mongoose.Document {
   firstName: string;
   lastName: string;
   customerId: string;
@@ -20,7 +20,7 @@ export interface UserType extends mongoose.Document {
   phoneNumber: string;
   email: string;
   password: string;
-  role: string;
+  role: string[];
   fullName: string;
   isActive: boolean;
   resetPasswordToken: string | undefined | null;
@@ -41,7 +41,7 @@ export interface UserType extends mongoose.Document {
   matchPassword: (enteredPassword: string) => boolean;
 }
 
-const UserSchema = new mongoose.Schema(
+const AuthSchema = new mongoose.Schema(
   {
     firstName: {
       type: String,
@@ -128,7 +128,7 @@ const UserSchema = new mongoose.Schema(
 
 // Encrypt password before saving new user
 // Should hash the password on registration.
-UserSchema.pre('save', async function (next: any) {
+AuthSchema.pre('save', async function (next: any) {
   //conditional will check to see if the password is being modified so it wont update the password constantly.
   if (!this.isModified('password')) {
     return next();
@@ -139,14 +139,14 @@ UserSchema.pre('save', async function (next: any) {
 });
 
 // creates the fullName field.
-UserSchema.pre('save', async function () {
+AuthSchema.pre('save', async function () {
   const firstName = this.firstName ?? '';
   const lastName = this.lastName ?? '';
   this.fullName = `${firstName} ${lastName}`.trim();
 });
 
 // Sign JWT and return
-UserSchema.methods.getSignedJwtToken = function () {
+AuthSchema.methods.getSignedJwtToken = function () {
   // JWT_SECRET is an environment variable, use the ! to tell typescript that it will be there.
   // as this method requires the JWT_SECRET to be set, it cannot be null or undefined.
   return jwt.sign({ id: this._id }, process.env.JWT_SECRET!, {
@@ -155,18 +155,18 @@ UserSchema.methods.getSignedJwtToken = function () {
 };
 
 // Match user entered password to hashed password in database
-UserSchema.methods.matchPassword = async function (enteredPassword: string) {
+AuthSchema.methods.matchPassword = async function (enteredPassword: string) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 // enforces that the email string be lower case throughout, as if it isnt, a user with
 // test@email.com and a user Test@email.com do not match, and you can end up with duplicate emails..
-UserSchema.pre('save', async function (next: any) {
+AuthSchema.pre('save', async function (next: any) {
   this.email = this.email!.toLowerCase();
   next();
 });
 
 // Generate and hash password token
-UserSchema.methods.getResetPasswordToken = async function () {
+AuthSchema.methods.getResetPasswordToken = async function () {
   // Generate a token
   // this returns a buffer, we want to make it into a string
   const resetToken = crypto.randomBytes(20).toString('hex');
@@ -180,4 +180,4 @@ UserSchema.methods.getResetPasswordToken = async function () {
   return resetToken;
 };
 
-export default mongoose.model<UserType>('User', UserSchema);
+export default mongoose.model<AuthType>('Auth', AuthSchema);

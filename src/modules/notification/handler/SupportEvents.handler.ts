@@ -1,5 +1,5 @@
 import { ErrorUtil } from '../../../middleware/ErrorUtil';
-import User from '../../auth/model/User';
+import User from '../../auth/model/Auth';
 import { EmailService } from '../email/EmailService';
 import Notification from '../model/Notification';
 
@@ -16,7 +16,6 @@ export default class SupportEventHandler {
         'support',
         event.ticket._id
       );
-      
     }
 
     // add a notification to the tickets assigned agent if there is one

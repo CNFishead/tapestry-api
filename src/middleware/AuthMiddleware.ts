@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import asyncHandler from './asyncHandler';
-import User from '../modules/auth/model/User';
+import User from '../modules/auth/model/Auth';
 import { AuthenticatedRequest } from '../types/AuthenticatedRequest';
 import { ErrorUtil } from './ErrorUtil';
 import { ModelMap } from '../utils/ModelMap';

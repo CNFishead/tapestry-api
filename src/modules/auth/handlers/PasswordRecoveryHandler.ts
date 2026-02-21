@@ -1,10 +1,8 @@
-import User, { UserType } from '../model/User';
+import User, { AuthType } from '../model/Auth';
 import crypto from 'crypto';
 
 export class PasswordRecoveryHandler {
-  async requestReset(
-    email: string
-  ): Promise<{ success: boolean; email?: string; token?: string }> {
+  async requestReset(email: string): Promise<{ success: boolean; email?: string; token?: string }> {
     // Validate user exists
     const user = await User.findOne({ email });
     if (!user) {
@@ -56,7 +54,7 @@ export class PasswordRecoveryHandler {
     };
   }
 
-  async resetPassword(token: string, newPassword: string): Promise<UserType> {
+  async resetPassword(token: string, newPassword: string): Promise<AuthType> {
     // Validate token + expiry
     const isValid = await this.verifyToken(token);
     if (!isValid.valid) {

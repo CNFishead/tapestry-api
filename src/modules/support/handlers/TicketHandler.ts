@@ -1,13 +1,10 @@
 import SupportTicket, { SupportType } from '../models/Support'; // Adjust path as needed
-import SupportGroup from '../models/SupportGroups';
-import { UserType } from '../../auth/model/User';
+import SupportGroup from '../models/SupportGroups'; 
 import { ErrorUtil } from '../../../middleware/ErrorUtil';
 import SupportMessage, { SupportMessageType } from '../models/SupportMessage';
 import mongoose from 'mongoose';
-import { CRUDHandler } from '../../../utils/baseCRUD';
-import socket from '../../../utils/socket';
-import Support from '../models/Support';
-import { assign } from 'nodemailer/lib/shared';
+import { CRUDHandler } from '../../../utils/baseCRUD'; 
+import Support from '../models/Support'; 
 
 export class TicketHandler extends CRUDHandler<SupportType> {
   constructor() {

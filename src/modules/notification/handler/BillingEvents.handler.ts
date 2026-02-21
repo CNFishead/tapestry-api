@@ -1,7 +1,7 @@
 import { ErrorUtil } from '../../../middleware/ErrorUtil';
 import { EmailService } from '../email/EmailService';
 import Notification from '../model/Notification';
-import User from '../../auth/model/User';
+import User from '../../auth/model/Auth';
 
 export default class BillingEventHandler {
   /**

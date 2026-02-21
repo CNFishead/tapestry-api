@@ -1,10 +1,10 @@
 import { ErrorUtil } from '../../../middleware/ErrorUtil';
 import { CRUDHandler, PaginationOptions } from '../../../utils/baseCRUD';
 import { ModelMap } from '../../../utils/ModelMap';
-import User, { UserType } from '../../auth/model/User';
+import User, { AuthType } from '../../auth/model/Auth';
 import crypto from 'crypto';
 
-export class UserHandler extends CRUDHandler<UserType> {
+export class UserHandler extends CRUDHandler<AuthType> {
   modelMap: Record<string, any>;
   constructor() {
     super(User);
@@ -20,7 +20,7 @@ export class UserHandler extends CRUDHandler<UserType> {
    * Override the base update method to ensure pre-save hooks are triggered
    * This is especially important for password hashing
    */
-  async update(id: string, data: any): Promise<UserType | null> {
+  async update(id: string, data: any): Promise<AuthType | null> {
     await this.beforeUpdate(id, data);
 
     // Find the document first
@@ -39,7 +39,7 @@ export class UserHandler extends CRUDHandler<UserType> {
     return updated;
   }
 
-  protected async afterDelete(doc: UserType | null): Promise<void> {
+  protected async afterDelete(doc: AuthType | null): Promise<void> {
     // now that we've removed the resource, we need to clean up any related data
     // start by going through the profileRefs, for each profile remove the userId, or linkedUsers (if team)
     if (!doc) return;
@@ -48,12 +48,12 @@ export class UserHandler extends CRUDHandler<UserType> {
       console.info(`[UserHandler]: Cleaning up profile for role: ${role}, profileId: ${profileId}`);
       const profile = await this.modelMap[role].findById(profileId);
       if (!profile) continue;
-      
+
       // Remove the userId from the profile
       profile.userId = null;
 
       if (role === 'team') {
-        profile.linkedUsers = profile.linkedUsers.filter((id: string) => id.toString() !== doc._id.toString() );
+        profile.linkedUsers = profile.linkedUsers.filter((id: string) => id.toString() !== doc._id.toString());
       }
       await profile.save();
     }

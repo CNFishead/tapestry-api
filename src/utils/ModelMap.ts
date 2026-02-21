@@ -1,6 +1,6 @@
 import { Model } from 'mongoose';
 import AdminModel from '../modules/profiles/admin/model/AdminModel';
-import User from '../modules/auth/model/User';
+import User from '../modules/auth/model/Auth';
 import Token from '../modules/auth/model/TokenSchema';
 import BillingAccount from '../modules/auth/model/BillingAccount';
 import Receipt from '../modules/payment/models/Receipt';

@@ -1,6 +1,6 @@
 import { Response } from 'express';
 import { AuthenticatedRequest } from '../../../types/AuthenticatedRequest';
-import User from '../../auth/model/User';
+import User from '../../auth/model/Auth';
 import error from '../../../middleware/error';
 import asyncHandler from '../../../middleware/asyncHandler';
 import { ErrorUtil } from '../../../middleware/ErrorUtil';

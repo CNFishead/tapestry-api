@@ -1,10 +1,10 @@
 import mongoose, { Mongoose } from 'mongoose';
 import { SupportType } from './Support';
-import { UserType } from '../../auth/model/User';
+import { AuthType } from '../../auth/model/Auth';
 
 export interface SupportGroupType extends mongoose.Document {
   name: string;
-  agents: UserType[];
+  agents: AuthType[];
   tickets: SupportType[];
   isActive: boolean;
 }

@@ -1,5 +1,5 @@
-import { Request } from "express"; 
-import { UserType } from "../modules/auth/model/User";
+import { Request } from 'express';
+import { AuthType } from '../modules/auth/model/Auth';
 
 /**
  * @description - This interface will be used to add the user object to the request object.
@@ -10,8 +10,8 @@ import { UserType } from "../modules/auth/model/User";
  * @lastModified - 2023-06-11T16:21:30.000-05:00
  */
 export interface AuthenticatedRequest extends Request {
-  // user should be of type UserType, with a token property
-  user: UserType & {
+  // user should be of type AuthType, with a token property
+  user: AuthType & {
     token?: string;
     roles?: string[];
   };

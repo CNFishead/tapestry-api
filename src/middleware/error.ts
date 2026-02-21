@@ -6,16 +6,24 @@
  */
 
 export default (error: any, req: any, res: any, next?: any) => {
-  let err = { ...error };
-  err.message = error.message;
+  // Safely extract error properties without spreading
+  const err = {
+    name: error.name,
+    message: error.message,
+    kind: error.kind,
+    value: error.value,
+    code: error.code,
+    errors: error.errors,
+    statusCode: error.statusCode,
+  };
 
   // Mongoose Bad Object ID
   if (err.name === 'CastError') {
-    const message = `No Resource Found with id: ${error.value}`;
+    const message = `No Resource Found with id: ${err.value}`;
     return res.status(404).json({ message });
   }
   if (err.kind === 'ObjectId') {
-    const message = `No Resource Found with id: ${error.value}`;
+    const message = `No Resource Found with id: ${err.value}`;
     return res.status(404).json({ message });
   }
   // Mongoose Duplicate key error
@@ -24,16 +32,16 @@ export default (error: any, req: any, res: any, next?: any) => {
     return res.status(400).json({ message });
   }
   // Mongoose Validation error
-  if (err.message.includes('validation failed')) {
+  if (err.message && err.message.includes('validation failed')) {
     const messages = Array.isArray(err.errors)
       ? err.errors.map((val: any) => val.message)
       : err.errors && typeof err.errors === 'object'
-      ? Object.values(err.errors).map((val: any) => val.message)
-      : [];
+        ? Object.values(err.errors).map((val: any) => val.message)
+        : [];
 
     return res.status(400).json({ message: messages.join(', ') || 'Validation Error' });
   }
-  return res
-    .status(err.statusCode || 500)
-    .json({ success: false, message: err.message || 'Server Error' });
+
+  console.log(`[Error Handler]:`, err);
+  return res.status(err.statusCode || 500).json({ success: false, message: err.message || 'Server Error' });
 };

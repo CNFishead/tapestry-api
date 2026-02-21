@@ -1,6 +1,6 @@
 import { Request } from 'express';
 import jwt from 'jsonwebtoken';
-import User from '../model/User';
+import Auth from '../model/Auth';
 import { AuthenticatedRequest } from '../../../types/AuthenticatedRequest';
 import axios from 'axios';
 import { ErrorUtil } from '../../../middleware/ErrorUtil';
@@ -16,12 +16,13 @@ export class AuthenticationHandler {
    */
   async login(req: Request) {
     const { email, password } = req.body;
+    console.log(`[AuthHandler]: email: ${email}; pass: ${password}`);
 
     if (!email || !password) {
       throw new Error('Email and password are required.');
     }
 
-    const user = await User.findOne({ email: email.trim().toLowerCase() }).select('+password');
+    const user = await Auth.findOne({ email: email.trim().toLowerCase() }).select('+password');
     if (!user) {
       throw new Error('Invalid credentials.');
     }
@@ -76,7 +77,7 @@ export class AuthenticationHandler {
       throw new ErrorUtil('User not authenticated.', 400);
     }
 
-    const foundUser = await User.findById(user._id).select('-password');
+    const foundUser = await Auth.findById(user._id).select('-password');
     if (!foundUser) {
       throw new ErrorUtil('User not found.', 404);
     }
@@ -86,8 +87,6 @@ export class AuthenticationHandler {
         email: foundUser.email,
         fullName: foundUser.fullName,
         roles: foundUser.role,
-        profileRefs: foundUser.profileRefs,
-        profileImageUrl: foundUser.profileImageUrl,
         acceptedPolicies: foundUser.acceptedPolicies || {},
         notificationSettings: foundUser.notificationSettings || {},
       },

@@ -1,11 +1,11 @@
-import { UserType } from '../model/User';
+import { AuthType } from '../model/Auth';
 import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import { RoleRegistry } from '../utils/RoleRegistry';
 import { ProfileCreationFactory } from '../factory/ProfileCreationFactory';
 // import { PaymentService } from '../service/PaymentService';
-import BillingAccount, { BillingAccountType } from '../model/BillingAccount'; 
+import BillingAccount, { BillingAccountType } from '../model/BillingAccount';
 import slugify from 'slugify';
 import Notification from '../../notification/model/Notification';
 import { ErrorUtil } from '../../../middleware/ErrorUtil';
@@ -134,17 +134,17 @@ export class RegisterHandler {
    * @description Creates profiles for the user based on their roles. Each role has a specific profile creator that handles the profile creation logic.
    * @throws {Error} If any profile creation fails, it will clean up the user and any created profiles.
    */
-  private async createProfiles() { 
-    for (const role of this.data.roles) { 
+  private async createProfiles() {
+    for (const role of this.data.roles) {
       const creator = ProfileCreationFactory.getProfileCreator(role);
-      if (!creator) continue; 
-      const profileData = this.data.profileData?.[role] ?? {}; 
+      if (!creator) continue;
+      const profileData = this.data.profileData?.[role] ?? {};
       try {
         const profile = await creator.createProfile(this.user._id, profileData);
         this.profileRefs[role] = profile.profileId;
 
         const roleMeta = RoleRegistry[role];
-        if (roleMeta?.isBillable && !this.customerCreated) { 
+        if (roleMeta?.isBillable && !this.customerCreated) {
           await this.createBillingAccount(profile.profileId, role);
           this.customerCreated = true;
         }
@@ -168,11 +168,11 @@ export class RegisterHandler {
    */
   private async createBillingAccount(profileId: string, role: string) {
     console.info(`[RegistrationHandler]: Creating billing account..`);
-    try {   
-      this.billingAccount = await BillingAccount.create({ 
+    try {
+      this.billingAccount = await BillingAccount.create({
         profileId: profileId as any,
         profileType: role,
-        email: this.data.email,  
+        email: this.data.email,
         status: 'active',
         vaulted: false,
         payor: this.user._id,
@@ -211,7 +211,7 @@ export class RegisterHandler {
    * @description Sets verification token and expiration for email verification.
    * @param email - The email to set the verification token for.
    */
-  public async setEmailVerificationToken(email: string): Promise<{ token: string; user: UserType }> {
+  public async setEmailVerificationToken(email: string): Promise<{ token: string; user: AuthType }> {
     const user = await this.modelMap['user'].findOne({ email });
     if (!user) throw new Error('User not found');
     const token = await crypto.randomBytes(20).toString('hex');
@@ -227,7 +227,7 @@ export class RegisterHandler {
    * @description Verifies the user's email using the provided token.
    * @param token - The verification token sent to the user's email.
    */
-  public async verifyEmail(token: string): Promise<{ message: string; user: UserType }> {
+  public async verifyEmail(token: string): Promise<{ message: string; user: AuthType }> {
     const user = await this.modelMap['user'].findOne({
       emailVerificationToken: token,
       emailVerificationExpires: { $gt: new Date() },

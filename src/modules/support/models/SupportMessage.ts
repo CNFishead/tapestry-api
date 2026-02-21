@@ -1,10 +1,10 @@
 import mongoose from 'mongoose';
 import { SupportType } from './Support';
-import { UserType } from '../../auth/model/User';
+import { AuthType } from '../../auth/model/Auth';
 
 export type SupportMessageType = {
   ticket: SupportType;
-  user: UserType;
+  user: AuthType;
   message: string;
   sender: {
     email?: string;

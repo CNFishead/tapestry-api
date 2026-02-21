@@ -1,14 +1,14 @@
 import mongoose, { Schema } from 'mongoose';
-import { UserType } from '../../auth/model/User';
+import { AuthType } from '../../auth/model/Auth';
 import { SupportGroupType } from './SupportGroups';
 
 export interface SupportType extends mongoose.Document {
-  requester: UserType;
+  requester: AuthType;
   requesterDetails: {
     email: string;
     fullName: string;
   };
-  assignee: UserType;
+  assignee: AuthType;
   groups: SupportGroupType[];
   subject: string;
   description: string;
