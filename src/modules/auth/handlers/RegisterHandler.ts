@@ -49,6 +49,13 @@ export class RegisterHandler {
   }> {
     try {
       this.data = data;
+
+      // Ensure 'player' is in the roles array for MVP - everyone gets a player profile
+      if (!this.data.roles.includes('player')) {
+        this.data.roles.unshift('player');
+        console.info('[RegistrationHandler]: Auto-adding player role to user roles');
+      }
+
       await this.createUser();
       await this.createProfiles();
 

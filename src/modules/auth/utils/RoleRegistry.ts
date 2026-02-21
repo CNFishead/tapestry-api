@@ -14,5 +14,15 @@ export const RoleRegistry: Record<string, RoleMetadata> = {
     billingScope: 'none',
     displayName: 'Admin',
   },
+  player: {
+    isBillable: false,
+    billingScope: 'none',
+    displayName: 'Player',
+  },
+  storyweaver: {
+    isBillable: false,
+    billingScope: 'none',
+    displayName: 'Storyweaver',
+  },
   // add others as needed
 };

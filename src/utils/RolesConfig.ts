@@ -80,6 +80,57 @@ export class RolesConfig {
       'analytics.business',
     ],
 
+    player: [
+      // Basic player permissions
+      'profile.read',
+      'profile.update',
+      'characters.read',
+      'characters.create',
+      'characters.update',
+      'characters.delete',
+      'games.read',
+      'games.join',
+      'games.leave',
+      'campaigns.read',
+      'campaigns.join',
+      'sessions.read',
+      'sessions.participate',
+    ],
+
+    storyweaver: [
+      // All player permissions plus game management
+      'profile.read',
+      'profile.update',
+      'characters.read',
+      'characters.create',
+      'characters.update',
+      'characters.delete',
+      'games.read',
+      'games.create',
+      'games.update',
+      'games.delete',
+      'games.manage',
+      'games.join',
+      'games.leave',
+      'campaigns.read',
+      'campaigns.create',
+      'campaigns.update',
+      'campaigns.delete',
+      'campaigns.manage',
+      'campaigns.join',
+      'sessions.read',
+      'sessions.create',
+      'sessions.update',
+      'sessions.delete',
+      'sessions.manage',
+      'sessions.participate',
+      'lfg.create',
+      'lfg.update',
+      'lfg.delete',
+      'players.invite',
+      'players.remove',
+    ],
+
     developer: [
       // Technical access with limited user management
       'users.read',
@@ -180,6 +231,20 @@ export class RolesConfig {
       description: 'Athlete evaluation and recruitment focused access',
       permissions: RolesConfig.DEFAULT_ROLE_PERMISSIONS.scout,
     },
+
+    player: {
+      roleName: 'player',
+      displayName: 'Player',
+      description: 'Basic player access for creating characters and joining games',
+      permissions: RolesConfig.DEFAULT_ROLE_PERMISSIONS.player,
+    },
+
+    storyweaver: {
+      roleName: 'storyweaver',
+      displayName: 'Storyweaver',
+      description: 'Game master access for creating and managing campaigns and sessions',
+      permissions: RolesConfig.DEFAULT_ROLE_PERMISSIONS.storyweaver,
+    },
   };
 
   /**
@@ -254,6 +319,8 @@ export class RolesConfig {
       developer: 3,
       scout: 2,
       support: 1,
+      storyweaver: 1,
+      player: 0,
     };
 
     return roleLevels[role.toLowerCase()] || 0;

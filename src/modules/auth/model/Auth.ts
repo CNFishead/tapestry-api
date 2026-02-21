@@ -2,7 +2,6 @@ import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
-import slugify from 'slugify';
 
 /**
  * @description Interface for the User model
@@ -131,11 +130,11 @@ const AuthSchema = new mongoose.Schema(
 AuthSchema.pre('save', async function (next: any) {
   //conditional will check to see if the password is being modified so it wont update the password constantly.
   if (!this.isModified('password')) {
-    return next();
+    return next;
     }
     const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password!, salt);
-  next();
+  next;
 });
 
 // creates the fullName field.
@@ -162,7 +161,7 @@ AuthSchema.methods.matchPassword = async function (enteredPassword: string) {
 // test@email.com and a user Test@email.com do not match, and you can end up with duplicate emails..
 AuthSchema.pre('save', async function (next: any) {
   this.email = this.email!.toLowerCase();
-  next();
+  next;
 });
 
 // Generate and hash password token
