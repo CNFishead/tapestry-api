@@ -18,6 +18,7 @@ export class AuthMiddleware {
     const authHeader = req.headers.authorization;
 
     if (!authHeader) {
+      console.warn('No authorization header provided.');
       throw new ErrorUtil('No authorization header provided.', 401);
     }
 
@@ -59,7 +60,7 @@ export class AuthMiddleware {
 
       next();
     } catch (err) {
-      // console.error(err);
+      console.warn('JWT validation failed:', err);
       return res.status(401).json({ message: 'JWT validation failed. ' + err });
     }
   }
