@@ -42,7 +42,7 @@ export default class RegistrationEventHandler {
         },
       });
     } catch (err: any) {
-      console.error(err.response.body.errors);
+      console.error(err.response.body.errors); 
       throw new ErrorUtil('Failed to handle user verify email event', 500);
     }
   };

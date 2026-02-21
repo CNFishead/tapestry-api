@@ -51,7 +51,8 @@ export class RegisterHandler {
       this.data = data;
 
       // Ensure 'player' is in the roles array for MVP - everyone gets a player profile
-      if (!this.data.roles.includes('player')) {
+      if (!this.data.roles || !this.data.roles.includes('player')) {
+        this.data.roles = this.data.roles || [];
         this.data.roles.unshift('player');
         console.info('[RegistrationHandler]: Auto-adding player role to user roles');
       }
