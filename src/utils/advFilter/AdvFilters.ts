@@ -21,15 +21,20 @@ export class AdvFilters {
       } else {
         try {
           // Use JSON.parse to safely convert the value to an object
-          const parsedValue = JSON.parse(value)
+          const parsedValue = JSON.parse(value);
+          if (parsedValue === null) {
+            filterOptionsObject[key] = null;
+            return;
+          }
           // Recursively parse the parsedValue if it contains nested objects
           const filteredValue = this.parseValueRecursively(parsedValue);
 
           // If key already exists, merge the parsed value
-          filterOptionsObject[key] = {
-            ...filterOptionsObject[key],
-            ...filteredValue,
-          };
+          if (filteredValue && typeof filteredValue === 'object') {
+            filterOptionsObject[key] = { ...filterOptionsObject[key], ...filteredValue };
+          } else {
+            filterOptionsObject[key] = filteredValue;
+          }
         } catch (error) {
           // If JSON.parse fails, check for valid ObjectId
           if (mongoose.Types.ObjectId.isValid(value)) {
