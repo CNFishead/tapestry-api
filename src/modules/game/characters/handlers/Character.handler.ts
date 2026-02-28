@@ -3,6 +3,7 @@ import { ErrorUtil } from '../../../../middleware/ErrorUtil';
 import { CRUDHandler, PaginationOptions } from '../../../../utils/baseCRUD';
 import CharacterModel, { CharacterType } from '../model/CharacterModel';
 import { eventBus } from '../../../../lib/eventBus';
+import { applyCharacterRules } from '../../rules';
 
 export class CharacterHandler extends CRUDHandler<CharacterType> {
   constructor() {
@@ -15,7 +16,31 @@ export class CharacterHandler extends CRUDHandler<CharacterType> {
       throw new ErrorUtil('Player reference is required', 400);
     }
 
-    // TODO: Add validation for character data structure once schema is finalized
+    // Apply game rules (aspect validation, HP calculation, threads enforcement)
+    // Character creation should have full sheet structure
+    try {
+      if (data.sheet) {
+        // Extract sheet data for rule validation
+        const sheetData = {
+          aspects: data.sheet.aspects,
+          hp: data.sheet.resources?.hp || { current: 0, max: 0, temp: 0 },
+          threads: data.sheet.resources?.threads || { current: 0, max: 0, temp: 0 },
+        };
+
+        // Apply rules
+        applyCharacterRules(sheetData as any);
+
+        // Apply calculated values back
+        if (!data.sheet.resources) {
+          data.sheet.resources = {};
+        }
+        data.sheet.resources.hp = sheetData.hp;
+        data.sheet.resources.threads = sheetData.threads;
+      }
+    } catch (error) {
+      throw new ErrorUtil(error instanceof Error ? error.message : 'Character validation failed', 400);
+    }
+
     // TODO: Validate setting if provided (check against SettingsRegistry)
   }
 
@@ -33,12 +58,58 @@ export class CharacterHandler extends CRUDHandler<CharacterType> {
   }
 
   protected async beforeUpdate(id: string, data: any): Promise<void> {
+    console.log('Before update data:', data);
     // Prevent changing the player owner
     if (data.player) {
       throw new ErrorUtil('Cannot change character owner', 400);
     }
+  }
 
-    // TODO: Add validation for character data structure once schema is finalized
+  /**
+   * Override update to handle partial updates with rule validation
+   * Uses unit of work pattern: Fetch -> Apply Changes -> Validate Rules -> Save
+   * This ensures rules are validated against the complete character state after applying partial updates
+   */
+  async update(id: string, data: any): Promise<CharacterType | null> {
+    await this.beforeUpdate(id, data);
+
+    // Fetch the existing character document
+    const character = await this.Schema.findById(id);
+    if (!character) {
+      throw new ErrorUtil('Character not found', 404);
+    }
+
+    // Apply partial updates to the document
+    // Mongoose's set() method handles dot notation (e.g., 'sheet.aspects.might.strength': 3)
+    for (const [key, value] of Object.entries(data)) {
+      character.set(key, value);
+    }
+
+    // Apply game rules to the character's sheet
+    // This validates aspects, recalculates HP based on strength, and enforces threads range
+    try {
+      // Extract sheet data for rule validation (rules expect flat structure)
+      const sheetData = {
+        aspects: character.sheet.aspects,
+        hp: character.sheet.resources.hp,
+        threads: character.sheet.resources.threads,
+      };
+
+      // Apply rules (validates and calculates)
+      applyCharacterRules(sheetData as any);
+
+      // Apply the rule calculations back to the document
+      character.sheet.resources.hp = sheetData.hp;
+      character.sheet.resources.threads = sheetData.threads;
+    } catch (error) {
+      throw new ErrorUtil(error instanceof Error ? error.message : 'Character validation failed', 400);
+    }
+
+    // Save the document (single DB write)
+    const updated = await character.save();
+    await this.afterUpdate(updated);
+
+    return updated;
   }
 
   /**

@@ -54,7 +54,11 @@ export class CRUDHandler<T extends mongoose.Document> {
 
   async update(id: string, data: any): Promise<T | null> {
     await this.beforeUpdate(id, data);
-    const updated = await this.Schema.findByIdAndUpdate(id, data, { new: true, runValidators: true });
+    // Wrap updates in $set for safety - ensures partial updates
+    // This prevents accidental document replacement
+    const updateData = { $set: data };
+    const updated = await this.Schema.findByIdAndUpdate(id, updateData, { returnDocument: 'after', runValidators: true });
+
     await this.afterUpdate(updated);
     return updated;
   }
@@ -115,7 +119,7 @@ export abstract class CRUDService {
       await this.beforeCreate(data);
       const result = await this.handler.create(data);
       await this.afterCreate(result);
-      return res.status(201).json({ success: true });
+      return res.status(201).json({ success: true, payload: result._id });
     } catch (err) {
       console.error(err);
       return error(err, req, res);
@@ -195,7 +199,7 @@ export abstract class CRUDService {
       await this.beforeUpdate(req.params.id as string, req.body);
       const result = await this.handler.update(req.params.id, req.body);
       await this.afterUpdate(result);
-      return res.status(201).json({ success: true });
+      return res.status(201).json({ success: true, payload: result });
     } catch (err) {
       console.error(err);
       return error(err, req, res);

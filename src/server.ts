@@ -47,7 +47,14 @@ app.use(cors({ origin: '*' }));
 
 //init middlewares
 //sanitize data
-app.use(mongoSanitize({}));
+app.use(
+  mongoSanitize({
+    onSanitize: ({ req, key }: any) => {
+      console.warn(`Sanitized key: ${key}`);
+    },
+    allowDots: true, // if supported, check package docs
+  })
+);
 //prevent XSS attacks
 app.use(xss());
 //prevent http paramter pollution
@@ -109,7 +116,7 @@ if (cluster.isPrimary) {
   });
 } else {
   // Connect to database
-  db();  
+  db();
   app.listen(5001, () => {
     console.info(`[Server]: Worker ${process.pid} started`);
   });
