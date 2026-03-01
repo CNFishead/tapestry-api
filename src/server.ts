@@ -100,8 +100,6 @@ app.get('/', (req: Request, res: Response) => {
 const numCPUs = os.cpus().length;
 const maxWorkers = Math.min(numCPUs, Number(process.env.CORE_CAP));
 
-// TODO: is there a better to handle this? I want to be able to run a single instance for testing
-// also everything like the server is being init in the else block, shouldnt it be primary?
 if (cluster.isPrimary) {
   console.info(`[Server]: Primary process ${process.pid} is running`.green);
 
@@ -117,9 +115,6 @@ if (cluster.isPrimary) {
 } else {
   // Connect to database
   db();
-  app.listen(5001, () => {
-    console.info(`[Server]: Worker ${process.pid} started`);
-  });
   //worker process runs the server
   const server = app.listen(PORT, () => {
     console.info(`[Server]: Server running; Worker ${process.pid} running in ${process.env.NODE_ENV} mode on port ${PORT}`.yellow.bold);
